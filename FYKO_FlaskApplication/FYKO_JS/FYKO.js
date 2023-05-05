@@ -3,56 +3,29 @@ if(window.localStorage)
     console.log("local storage supported !");
 }
 
-function saveTfjsZip(pdf, key) {
-    console.log("In saveTfjsZip")
-    var fileReader = new FileReader();
+// request for a TFJS based Simple ANN
+let response = await new Promise(resolve => {
+    var xhr_get_ann = new XMLHttpRequest(); 
+    xhr_get_ann.open("POST", '/get_ann'); 
+    xhr_get_ann.setRequestHeader("Content-Type", "application/json");
+    xhr_get_ann.onload = function(e) {
+        resolve(xhr_get_ann.response);
+      };
+      xhr_get_ann.onerror = function () {
+        resolve(undefined);
+        console.error("Error case");
+      };
+    xhr_get_ann.send(JSON.stringify({"format":"tfjs"}));
+ }) 
+ console.log('response='+response)
+ var json_response = JSON.parse(response);
+ console.log('json_response='+json_response)
 
-    fileReader.onload = function (evt) {
-        var result = evt.target.result;
+var ann_id = json_response['ann_id']
+console.log('ann_id='+ann_id)
 
-        try {
-            console.log('result='+result)
-            var prefix = 'data:application/x-zip-compressed;base64,';
-            console.log('Prefix len='+prefix.length)
-            var base64ZipString = result.substring(prefix.length)
-            console.log('base64ZipString:'+base64ZipString)
-            localStorage.setItem(key, result);
-            var new_zip = new JSZip();
-            new_zip.loadAsync(base64ZipString,{base64: true}).then(async function(zip){
-                //var jsonFile = await zipped.file("model.json").async("text");
-                Object.keys(zip.files).forEach(function (filename) {
-                    zip.files[filename].async('string').then(function (fileData) {
-                      console.log('filename:'+filename+',fileData:'+fileData) // These are your file contents
-                      localStorage.setItem(filename, fileData);      
-                    })
-                  })
-            });
-        } catch (e) {
-            console.log("Storage failed: " + e);
-        }
-    };
-
-    fileReader.readAsDataURL(pdf);
-}
-
-// model zip download
-var xhr = new XMLHttpRequest(); 
-xhr.open("GET", "/data/tfjs.zip"); 
-xhr.responseType = "blob";
-xhr.onload = function() {
-    console.log("XMLHttpRequest, xhr.status="+xhr.status)
-    if(xhr.status && xhr.status === 200) {
-        saveTfjsZip(xhr.response, "tfjs.zip");
-    } 
-}
-xhr.send();
-
-const model = await tf.loadLayersModel('http://localhost:8000/data/tfjs/model.json');
+const model = await tf.loadLayersModel('http://localhost:8000/tfjs/'+ann_id+'/model.json');
 console.log("model loaded !");
-const saveResults = model.save('localstorage://my-model-1');
-
-const model2 = await tf.loadLayersModel('localStorage://tfjs/model.json');
-console.log("model2 loaded !");
 
 if(window.crypto.subtle)
 {

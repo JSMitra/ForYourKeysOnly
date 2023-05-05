@@ -40,7 +40,8 @@ def get_ann():
     if format == Constants.TFJS:
         model = Utility.generate_ANN(use_complex_model=False)
         model_folder_path = Utility.save_model(model=model, format=format, is_complex=False,  model_folder_path='/models/')
-        return Utility.compose_get_ann_response(model_file_path=model_folder_path, format=format, is_encrypted=False,ann_id=model_folder_path)
+        model_folder = Utility.os.path.basename(model_folder_path).split('/')[-1]
+        return Utility.compose_get_ann_response(model_file_path=model_folder, format=format, is_encrypted=False,ann_id=model_folder_path)
     elif format == Constants.H5:
         model_to_share = ''
         directory = '.'
@@ -108,6 +109,12 @@ def handle_encrypted_request():
         "request_message":message_in_request
     }
     return jsonify(response_json)
+
+# path to fetch html page which inturn loads FYKO.js file which uses Tensorflowjs to load and use ANN models
+@app.route('/tfjs/FYKO_JS/<file_name>', methods=['GET'])
+def get_tfjs_client(file_name):
+    directory = './FYKO_JS'
+    return send_from_directory(directory=directory, path=file_name)
 
 # path to fetch model json for Tensorflowjs (tfjs) clients which are Javascript based meant for browser apps
 @app.route('/tfjs/<model_name>/<model_file>', methods=['GET'])
