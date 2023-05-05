@@ -33,30 +33,39 @@ def get_ann():
     if (format != Constants.H5) and (format != Constants.TFJS):
         format = Constants.H5
 
-    model_to_share = ''
-    directory = '.'
-    aes_key_encrypted_base64 = Constants.NA
-    model = Utility.generate_ANN(use_complex_model=False)
-    model_file_path = Utility.save_model(model=model, format=format, is_complex=False,  model_folder_path='/models/')
-    logging.log(msg='model_file_path='+model_file_path, level=logging.ERROR)
-    is_encrypted = True
-    if json.get(Constants.RSA_PUBLIC_KEY_2048_BASE64) != 'None':
-        public_key_pem = base64.b64decode(json.get(Constants.RSA_PUBLIC_KEY_2048_BASE64))
-        public_key = RSA.import_key(public_key_pem)
-        rsa_pub_key_base64 = base64.b64encode(public_key.export_key()).decode("ascii")
-        model_file_encrypted_path, aes_key_encrypted_base64 = Utility.encrypt_model(model_file_path=model_file_path, rsa_public_key=public_key, format='h5')
-        logging.log(msg='model_file_encrypted_path='+model_file_encrypted_path, level=logging.ERROR)
-        logging.log(msg='aes_key_encrypted_base64='+aes_key_encrypted_base64, level=logging.ERROR)
-        encrypted_model_name = Utility.os.path.basename(model_file_encrypted_path).split('/')[-1]
-        model_to_share = encrypted_model_name
-        model_file_path = model_file_encrypted_path
-    else:
-        is_encrypted = False
-        model_to_share = Utility.os.path.basename(model_file_path).split('/')[-1]
-    directory = Utility.os.path.dirname(model_file_path)
-    logging.log(msg='model_to_share='+model_to_share, level=logging.ERROR)
-    logging.log(msg='directory='+directory, level=logging.ERROR)
-    return Utility.compose_get_ann_response(model_file_path=model_file_encrypted_path, is_encrypted=is_encrypted,ann_id=model_to_share, aes_key_encrypted_base64=aes_key_encrypted_base64)
+    # TFJS Models are created in a directory with model.json along with .bin files representing model weights
+    # This application would create the TFJS model directory and share the directory name with the Client
+    # Client has load the model by appending model.json to the URL to further fetch the .bin files from the same
+    # directory
+    if format == Constants.TFJS:
+        model = Utility.generate_ANN(use_complex_model=False)
+        model_folder_path = Utility.save_model(model=model, format=format, is_complex=False,  model_folder_path='/models/')
+        return Utility.compose_get_ann_response(model_file_path=model_folder_path, format=format, is_encrypted=False,ann_id=model_folder_path)
+    elif format == Constants.H5:
+        model_to_share = ''
+        directory = '.'
+        aes_key_encrypted_base64 = Constants.NA
+        model = Utility.generate_ANN(use_complex_model=False)
+        model_file_path = Utility.save_model(model=model, format=format, is_complex=False,  model_folder_path='/models/')
+        logging.log(msg='model_file_path='+model_file_path, level=logging.ERROR)
+        is_encrypted = True
+        if json.get(Constants.RSA_PUBLIC_KEY_2048_BASE64) != 'None':
+            public_key_pem = base64.b64decode(json.get(Constants.RSA_PUBLIC_KEY_2048_BASE64))
+            public_key = RSA.import_key(public_key_pem)
+            rsa_pub_key_base64 = base64.b64encode(public_key.export_key()).decode("ascii")
+            model_file_encrypted_path, aes_key_encrypted_base64 = Utility.encrypt_model(model_file_path=model_file_path, rsa_public_key=public_key, format='h5')
+            logging.log(msg='model_file_encrypted_path='+model_file_encrypted_path, level=logging.ERROR)
+            logging.log(msg='aes_key_encrypted_base64='+aes_key_encrypted_base64, level=logging.ERROR)
+            encrypted_model_name = Utility.os.path.basename(model_file_encrypted_path).split('/')[-1]
+            model_to_share = encrypted_model_name
+            model_file_path = model_file_encrypted_path
+        else:
+            is_encrypted = False
+            model_to_share = Utility.os.path.basename(model_file_path).split('/')[-1]
+        directory = Utility.os.path.dirname(model_file_path)
+        logging.log(msg='model_to_share='+model_to_share, level=logging.ERROR)
+        logging.log(msg='directory='+directory, level=logging.ERROR)
+        return Utility.compose_get_ann_response(model_file_path=model_file_encrypted_path, format=format, is_encrypted=is_encrypted,ann_id=model_to_share, aes_key_encrypted_base64=aes_key_encrypted_base64)
 
 @app.route('/send_message', methods=['POST'])
 def handle_encrypted_request():
@@ -100,6 +109,16 @@ def handle_encrypted_request():
     }
     return jsonify(response_json)
 
+# path to fetch model json for Tensorflowjs (tfjs) clients which are Javascript based meant for browser apps
+@app.route('/tfjs/<model_name>/<model_file>', methods=['GET'])
+def get_tfjs_ann(model_name, model_file):
+    directory = './models/'+model_name
+    return send_from_directory(directory=directory, path=model_file)
+
+# path to fetch JSZip file for Tensorflow js
+@app.route('/jszip', methods=['GET'])
+def get_jszip():
+    return send_from_directory(directory=Constants.JSZIP_DIRECTORY, path=Constants.JSZIP_JS_FILE)
 
 if (__name__ == '__main__'):
     app.run()

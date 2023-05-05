@@ -171,14 +171,14 @@ COMPLEX_TFJS_MODEL_TEMPLATE = 'complex_tfjs_model_{suffix}'
 def save_model(model, suffix='', is_complex=False,format='h5', drive_path='.', model_folder_path='/models/'):
     if len(suffix) == 0:
       suffix = str(time.time())
-    if format == 'h5':
+    if format == Constants.H5:
         if is_complex == True:
             model_file_name = drive_path + model_folder_path + COMPLEX_MODEL_H5_TEMPLATE.format(suffix=suffix)
         else:
             model_file_name = drive_path + model_folder_path + SIMPLE_MODEL_H5_TEMPLATE.format(suffix=suffix)
         model.save(model_file_name, overwrite=True)
         return model_file_name
-    elif format == 'json':
+    elif format == Constants.JSON:
         if is_complex == True:
             model_file_name = drive_path + model_folder_path + COMPLEX_MODEL_JSON_TEMPLATE.format(suffix=suffix)
         else:
@@ -187,12 +187,15 @@ def save_model(model, suffix='', is_complex=False,format='h5', drive_path='.', m
         model_json_file = open(model_file_name, "w")
         model_json_file.write(model_json)
         return model_file_name
-    elif format == 'tfjs':
+    elif format == Constants.TFJS:
         if is_complex == True:
-            model_folder_name = drive_path + model_folder_path + COMPLEX_TFJS_MODEL_TEMPLATE.format(suffix=suffix)
+          model_folder_name = model_folder_path + COMPLEX_TFJS_MODEL_TEMPLATE.format(suffix=suffix)
+          model_folder_full_path = drive_path + model_folder_name
         else:
-            model_folder_name = drive_path + model_folder_path + SIMPLE_TFJS_MODEL_TEMPLATE.format(suffix=suffix)
-        tfjs.converters.save_keras_model(model,model_folder_name)
+          model_folder_name = model_folder_path + SIMPLE_TFJS_MODEL_TEMPLATE.format(suffix=suffix)
+        
+        model_folder_full_path = drive_path + model_folder_name
+        tfjs.converters.save_keras_model(model,model_folder_full_path)
         return model_folder_name
     return None
 
@@ -236,18 +239,27 @@ def encrypt_model(model_file_path, rsa_public_key, format=Constants.H5):
         model_file_encrypted.close()
         return model_file_encrypted_path, aes_key_encrypted_base64
     
-def compose_get_ann_response(model_file_path, ann_id="ann_id", is_encrypted=True, aes_key_encrypted_base64=Constants.NA):
-   ann_file = open(model_file_path, "rb")
-   ann_file_contents = ann_file.read()
-   ann_file_contents_b64_encoded = base64.b64encode(ann_file_contents).decode("ascii")
-   get_ann_response_json = {
-      Constants.IS_ENCRYPTED: is_encrypted,
-      Constants.ANN_ID: ann_id,
-      Constants.ANN_BASE64: ann_file_contents_b64_encoded,
-      Constants.AES_KEY_ENCRYPTED: aes_key_encrypted_base64
-   }
-   #return Response(jsonify(get_ann_response_json), mimetype='application/json')
-   return jsonify(get_ann_response_json)
+def compose_get_ann_response(model_file_path, ann_id="ann_id",format=Constants.H5, is_encrypted=True, aes_key_encrypted_base64=Constants.NA):
+  ann_response_json = {}
+  if format == Constants.H5:
+    ann_file = open(model_file_path, "rb")
+    ann_file_contents = ann_file.read()
+    ann_file_contents_b64_encoded = base64.b64encode(ann_file_contents).decode("ascii")
+    ann_response_json = {
+        Constants.FORMAT: Constants.H5,
+        Constants.IS_ENCRYPTED: is_encrypted,
+        Constants.ANN_ID: ann_id,
+        Constants.ANN_BASE64: ann_file_contents_b64_encoded,
+        Constants.AES_KEY_ENCRYPTED: aes_key_encrypted_base64
+    }
+  #return Response(jsonify(get_ann_response_json), mimetype='application/json')
+  elif format == Constants.TFJS:
+    ann_response_json = {
+      Constants.FORMAT: Constants.TFJS,
+      Constants.IS_ENCRYPTED: False,
+      Constants.ANN_ID: model_file_path
+      }
+  return jsonify(ann_response_json)
 
 def get_error_json(err_msg='Error!'):
   error_json = {

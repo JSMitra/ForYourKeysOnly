@@ -10,6 +10,8 @@
             - pip install pycryptodome
             - pip install flask
             - pip install python-dotenv
+            - pip install protobuf==3.20.* (if protobuf >= 3.19.0 needed)
+        - Tensorflowjs requires jszip javacript library. Download from https://stuk.github.io/jszip/ the latest zip file and place it in this folder. Update the distribution path (dist path) in Constants.py JSZIP_DIRECTORY variable. Update JSZIP_JS_FILE variable to point to jszip.min.js file (or the file recommended by JSZIP website)
 
     Project Information:
         -This project runs a Python FYKO Flask Server which serves ANN models

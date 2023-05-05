@@ -1,5 +1,8 @@
 TFJS = 'tfjs'
 H5 = 'h5'
+JSON = "json"
+JSZIP_DIRECTORY  = './Stuk-jszip-2ceb998/dist'
+JSZIP_JS_FILE = 'jszip.min.js'
 APPLICATION_JSON = "application/json"
 RSA_PUBLIC_KEY_2048_BASE64 = 'rsa_public_key_2048_base64'
 ANN_ID = 'ann_id'
