@@ -9,6 +9,7 @@
             - pip install tensorflowjs
             - pip install pycryptodome
             - pip install flask
+            - pip install python-dotenv
 
     Project Information:
         -This project runs a Python FYKO Flask Server which serves ANN models
