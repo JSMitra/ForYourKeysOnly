@@ -3,7 +3,7 @@
 ### Its for your keys only i.e., to protect your AES Keys from sharing on the network but yet enabling Clients and Server to interact using shared ANN Models.
 
 ## ForYourKeysOnly or FYKO is a Project that makes use of ANNs for Generation of AES Keys which inturn can be used to encrypt data.
-ANNs bring the advantages of generating chaotic outputs which are sensitive to vatying inputs. Exploiting this behavior, AES Keys are generated 
+ANNs bring the advantages of generating chaotic outputs which are sensitive to varying inputs. Exploiting this behavior, AES Keys are generated 
 using deterministic inputs to the ANN. A Client and a Server can share a common ANN Model for secure communication. 
 The Client can make a request to securely obtain an ANN Model from the Server which has a unique ID (ANN ID). 
 The Client can then feed deterministic inputs into the ANN Model to obtain random AES Keys and  can encrypt request data using that AES Key. 
