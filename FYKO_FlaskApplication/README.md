@@ -29,3 +29,4 @@ An application server which can Serve ANN Models and interact with clients secur
     Running the FYKO application:
         - Open FYKO.py and run the application in debug on run mode
         - This application URL is used in FYKO.ipynb Jupyter notebook as a part of Experiment to check Python Client interacting with this server
+        - This application URL is also used in FYKO_Java and FYKO_JS Client to demonstrate ANN secured Client-Server interations.
