@@ -32,5 +32,5 @@ Following are the important Sub-Projects:
    
 	- FYKO_Clients folder consists of a FYKO_Java project which illustrates secure communication with Flask Application using Java code
 
-Each project folder would be provided with its README.md file consisting of Setup and other instructions.
+Each project folder is provided with its README.md file consisting of Setup and other instructions.
 
