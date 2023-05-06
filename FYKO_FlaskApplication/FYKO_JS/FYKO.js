@@ -84,11 +84,6 @@ function getAesKeyBinaryString(floatArray, mean_value){
 var fyko_output = "fyko_output"
 
 
-if(window.crypto.subtle)
-{
-    document.getElementById(fyko_output).innerHTML = "Subtle crypto there !";
-}
-
 if(window.localStorage)
 {
     document.getElementById(fyko_output).innerHTML += "<br/><br/> Local storage supported. ANN model will be stored in localstorage";
@@ -151,9 +146,10 @@ var aesKeyHexString = getHexString(aesKeyBinaryString)
 document.getElementById(fyko_output).innerHTML += "<br/><br/>s AES Key Generated = "+aesKeyHexString;
 
 // Step 6: Prepare a secret message to be sent to the server using AES Key generated.
-var secret_message = "Hi in Telugu:హాయ్, Hi in Chinese:你好, Hi in Japanese:やあ"
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 6: Prepare a secret message to be sent to the server using AES Key generated.";
+var secret_message = "Hi in Telugu:హాయ్, Hi in Chinese:你好, Hi in Japanese:やあ "
 document.getElementById(fyko_output).innerHTML += "<br/><br/> secret_message = "+secret_message;
-var secret_message_uri_encoded = encodeURIComponent(encodeURIComponent(secret_message))
+var secret_message_uri_encoded = encodeURIComponent(secret_message)
 document.getElementById(fyko_output).innerHTML += "<br/><br/> secret_message_uri_encoded = "+secret_message_uri_encoded;
 var secret_message_b64_string = window.btoa(secret_message_uri_encoded)
 document.getElementById(fyko_output).innerHTML += "<br/><br/> secret_message_b64_string = "+secret_message_b64_string;
@@ -162,7 +158,10 @@ var encrypted_message = CryptoJS.AES.encrypt(secret_message_b64_string, key, { m
 document.getElementById(fyko_output).innerHTML += "<br/><br/> encrypted_message = "+encrypted_message;
 
 // Step 7: Send encrypted message to server
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 7: Send encrypted message to server";
 var send_message_obj = new Object();
+send_message_obj.format="tfjs"
+send_message_obj.is_message_uri_encoded=true
 send_message_obj.random_string = random_string
 send_message_obj.utc_time_seconds = current_time
 send_message_obj.random_string = random_string
@@ -171,17 +170,68 @@ send_message_obj.ann_id = ann_id
 var send_message_string = JSON.stringify(send_message_obj)
 
 document.getElementById(fyko_output).innerHTML += "<br/><br/> Sending message = "+send_message_string;
-
 response = await new Promise(resolve => {
-    var xhr_get_ann = new XMLHttpRequest(); 
-    xhr_get_ann.open("POST", '/send_message'); 
-    xhr_get_ann.setRequestHeader("Content-Type", "application/json");
-    xhr_get_ann.onload = function(e) {
-        resolve(xhr_get_ann.response);
+    var xhr_send_message = new XMLHttpRequest(); 
+    xhr_send_message.open("POST", '/send_message'); 
+    xhr_send_message.setRequestHeader("Content-Type", "application/json");
+    xhr_send_message.onload = function(e) {
+        resolve(xhr_send_message.response);
       };
-      xhr_get_ann.onerror = function () {
+      xhr_send_message.onerror = function () {
         resolve(undefined);
         console.error("Error case");
       };
-    xhr_get_ann.send(send_message_string);
+      xhr_send_message.send(send_message_string);
  })
+
+ // Step 8: Verify if Server is able to decrypt the message correctly
+ json_response = JSON.parse(response);
+ document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 8: Verify if Server is able to decrypt the message correctly";
+ document.getElementById(fyko_output).innerHTML += "<br/><br/> Response from server after decoding = "+response;
+ document.getElementById(fyko_output).innerHTML += "<br/><br/> Original Message: = "+secret_message;
+ document.getElementById(fyko_output).innerHTML += "<br/><br/> Message decoded by Server: = "+json_response['request_message'];
+ document.getElementById(fyko_output).innerHTML += "<br/><br/> Is the original secret message sent equal to the request message in response: = "+(json_response['request_message'] == secret_message);
+
+// Step 9:
+current_time = Math.round(d.getTime()/1000);
+current_time = current_time - 20
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 9: Replay Attack Scenario";
+send_message_obj.utc_time_seconds = current_time
+send_message_string = JSON.stringify(send_message_obj)
+response = await new Promise(resolve => {
+    var xhr_send_message = new XMLHttpRequest(); 
+    xhr_send_message.open("POST", '/send_message'); 
+    xhr_send_message.setRequestHeader("Content-Type", "application/json");
+    xhr_send_message.onload = function(e) {
+        resolve(xhr_send_message.response);
+      };
+      xhr_send_message.onerror = function () {
+        resolve(undefined);
+        console.error("Error case");
+      };
+      xhr_send_message.send(send_message_string);
+ })
+ json_response = JSON.parse(response);
+ document.getElementById(fyko_output).innerHTML += "<br/> Response from server ="+response;
+
+// Step 10:
+current_time = Math.round(d.getTime()/1000);
+current_time = current_time + 20
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 10: Send future message";
+send_message_obj.utc_time_seconds = current_time
+send_message_string = JSON.stringify(send_message_obj)
+response = await new Promise(resolve => {
+    var xhr_send_message = new XMLHttpRequest(); 
+    xhr_send_message.open("POST", '/send_message'); 
+    xhr_send_message.setRequestHeader("Content-Type", "application/json");
+    xhr_send_message.onload = function(e) {
+        resolve(xhr_send_message.response);
+      };
+      xhr_send_message.onerror = function () {
+        resolve(undefined);
+        console.error("Error case");
+      };
+      xhr_send_message.send(send_message_string);
+ })
+ json_response = JSON.parse(response);
+ document.getElementById(fyko_output).innerHTML += "<br/> Response from server ="+response;

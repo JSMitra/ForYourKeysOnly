@@ -10,6 +10,7 @@ IS_ENCRYPTED = 'is_encrypted'
 ANN_BASE64 = 'ann_base64'
 AES_KEY_ENCRYPTED = 'aes_key_encrypted'
 FORMAT = "format"
+IS_MESSAGE_URI_ENCODED = "is_message_uri_encoded"
 NA = 'NA'
 ENCRYPTED_MESSAGE = "encrypted_message"
 RANDOM_STRING = "random_string"

@@ -9,6 +9,11 @@ import logging
 import base64
 import keras
 import time
+# for Tensorflow JS
+import tensorflowjs as tfjs
+import requests
+import urllib
+
 
 app = Flask(__name__)
 logger_level_set = False
@@ -78,6 +83,10 @@ def handle_encrypted_request():
     json = request.json
     logging.log(msg='request json='+str(json), level=logging.ERROR)
     
+    format = json.get(Constants.FORMAT)
+    if (format != Constants.H5) and (format != Constants.TFJS):
+        format = Constants.H5
+    is_message_uri_encoded = json.get(Constants.IS_MESSAGE_URI_ENCODED)
     enc_message = json.get(Constants.ENCRYPTED_MESSAGE)
     utc_time_seconds = json.get(Constants.UTC_TIME_SECONDS)
     random_string = json.get(Constants.RANDOM_STRING)
@@ -101,9 +110,15 @@ def handle_encrypted_request():
     if ann_id.endswith('.encrypted'):
         ann_id = ann_id[0: len(ann_id) - len('.encrypted')]
     model_file_path = model_folder_path + ann_id
-    model = keras.models.load_model(model_file_path)
+    if format == Constants.H5:
+        model = keras.models.load_model(model_file_path)
+    elif format == Constants.TFJS:
+        model= tfjs.converters.load_keras_model(model_file_path+'/model.json')
+
     aes_key,_,_,_ = Utility.generate_aes_key(model, random_string=random_string, utc_time=str(utc_time_seconds))
     message_in_request = Utility.decrypt_message_with_aes_key(encrypted_message=enc_message, aes_key=aes_key)
+    if is_message_uri_encoded == True:
+        message_in_request = urllib.parse.unquote(message_in_request)
     logging.log(msg='message_in_request='+message_in_request, level=logging.ERROR)
     response_json = {
         "request_message":message_in_request
