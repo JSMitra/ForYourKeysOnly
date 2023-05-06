@@ -1,5 +1,5 @@
 # FYKO Flask Application
-An application server which can Serve ANN Models and interact with client securely using those Models.
+An application server which can Serve ANN Models and interact with clients securely using those Models.
 
     Setup:
         - Open this project in Visual Studio Code
