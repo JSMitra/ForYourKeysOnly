@@ -1,5 +1,6 @@
 # ForYourKeysOnly (FYKO)
 Cyber Security Application using AES Key Generation through ANNs
+Its for your keys only i.e., to protect your AES Keys from sharing on the network but yet enabling Clients and Server to interact using shared ANN Models.
 
 ## ForYourKeysOnly or FYKO is a Project that makes use of ANNs for Generation of AES Keys which inturn can be used to encrypt data.
 ANNs bring the advantages of generating chaotic outputs which are sensitive to vatying inputs. Exploiting this behavior, AES Keys are generated 
