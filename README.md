@@ -14,7 +14,9 @@ had produced at its end and decrypt Client's request data.
 In the whole design, sharing of AES Keys over the network is prevented. The only important requirement would be to trasmit the ANN Model itself securely
 from the Server to the Client. Using standard native Clients based on Java or Python Runtime, it is easy to produce RSA Keypairs at the Client side and 
 share the RSA Public Key with the Server to encrypt the ANN Model. For Javascript based Clients running on browser, this approach may not work and 
-secure delivery of ANN Model solely depends SSL/TLS communication using HTTPS.
+secure delivery of ANN Model solely depends SSL/TLS communication using HTTPS. HTTPS based Application Server is not covered as a part of this project as its a widely
+available piece of knowledge and production Servers are all deployed on HTTPS itself for the Clients to communicate securely. This project mainly deals
+with Application level security of protecting Client data reaching its Server.
 
 This project depicts the Proof of Concept(POC) of usability of ANNs for the desired job of AES Key production. It also depicts three different Clients 
 (Python, Java and Javascript) to show how they can interact with a Python based Flask Application Server which can serve ANN Models securely and also take
