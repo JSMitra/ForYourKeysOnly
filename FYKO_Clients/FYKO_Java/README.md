@@ -7,4 +7,5 @@ Java code to fetch ANN Model from FYKO Flask Application (refer FYKO_FlaskApplic
 	- Run FYKO.java as a Java Applications.
 	- Utility.java consists of all the helper functions.
 	- Project dependencies can be found in pom.xml
+	- Model H5 files are stored in the project root folder itself during code execution.
 
