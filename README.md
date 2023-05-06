@@ -6,7 +6,7 @@
 ANNs bring the advantages of generating chaotic outputs which are sensitive to varying inputs. Exploiting this behavior, AES Keys are generated 
 using deterministic inputs to the ANN. A Client and a Server can share a common ANN Model for secure communication. 
 The Client can make a request to securely obtain an ANN Model from the Server which has a unique ID (ANN ID). 
-The Client can then feed deterministic inputs into the ANN Model to obtain random AES Keys and  can encrypt request data using that AES Key. 
+The Client can then feed deterministic inputs into the ANN Model to obtain a random AES Key and can encrypt request data using that AES Key. 
 The Client just has to share the deterministic inputs, ANN ID and the encrypted data with the Server. 
 The Server, using the ANN ID can fetch the ANN Model from storage, re-play the deterministic inputs on the ANN to obtain the same AES Key that the Client 
 had produced at its end and decrypt Client's request data.
