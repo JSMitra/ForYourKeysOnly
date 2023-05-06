@@ -1,4 +1,4 @@
-# ForYourKeysOnly (FYKO)
+# ForYourKeysOnly (FYKO, can be pronounced as Fi-Ko or φ-Ko)
 ### Cyber Security Application using AES Key Generation through ANNs
 ### Its for your keys only i.e., to protect your AES Keys from sharing on the network but yet enabling Clients and Server to interact using shared ANN Models.
 
