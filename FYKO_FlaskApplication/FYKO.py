@@ -128,4 +128,4 @@ def get_jszip():
     return send_from_directory(directory=Constants.JSZIP_DIRECTORY, path=Constants.JSZIP_JS_FILE)
 
 if (__name__ == '__main__'):
-    app.run()
+    app.run(port=8000)

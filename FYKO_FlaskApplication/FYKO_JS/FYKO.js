@@ -1,50 +1,3 @@
-if(window.localStorage)
-{
-    console.log("local storage supported !");
-}
-
-// request for a TFJS based Simple ANN
-let response = await new Promise(resolve => {
-    var xhr_get_ann = new XMLHttpRequest(); 
-    xhr_get_ann.open("POST", '/get_ann'); 
-    xhr_get_ann.setRequestHeader("Content-Type", "application/json");
-    xhr_get_ann.onload = function(e) {
-        resolve(xhr_get_ann.response);
-      };
-      xhr_get_ann.onerror = function () {
-        resolve(undefined);
-        console.error("Error case");
-      };
-    xhr_get_ann.send(JSON.stringify({"format":"tfjs"}));
- }) 
- console.log('response='+response)
- var json_response = JSON.parse(response);
- console.log('json_response='+json_response)
-
-var ann_id = json_response['ann_id']
-console.log('ann_id='+ann_id)
-
-const model = await tf.loadLayersModel('http://localhost:8000/tfjs/'+ann_id+'/model.json');
-console.log("model loaded !");
-
-if(window.crypto.subtle)
-{
-    console.log("subtle crypto there !");
-}
-// declare all characters
-
-const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-function generateString(length) {
-    let result = ' ';
-    const charactersLength = characters.length;
-    for ( let i = 0; i < length; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-
-    return result;
-}
-
 function interleave_binary_strings(binarystring1, binarystring2){
     var resultstring = ''
     if(binarystring1.length == binarystring2.length){
@@ -70,7 +23,6 @@ function getHexString(binaryString){
 }
 
 function getBinaryString(hexstring){
-    console.log(hexstring)
     var binarystring = ''
     if(hexstring){
         var hexstring_len = hexstring.length;
@@ -129,28 +81,107 @@ function getAesKeyBinaryString(floatArray, mean_value){
     return binaryString
 }
 
-const d = new Date();
-//var current_time = Math.round(d.getTime()/1000);
-var current_time = 1682784885;
-//var random_string = window.crypto.randomUUID()
-var random_string = '6kn^,HU';
-var current_time_hash = CryptoJS.MD5(''+current_time).toString();
-console.log("md5 of current_time "+current_time+":"+current_time_hash);
-var random_string_hash = CryptoJS.MD5(random_string).toString();
-console.log("md5 of random_string "+random_string+":"+random_string_hash);
-var binary_input_string = interleave_binary_strings(getBinaryString(random_string_hash), getBinaryString(current_time_hash))
-console.log('Combined input string:'+binary_input_string)
-var combined_hex_string = getHexString(binary_input_string)
-console.log('Combined input hex:'+combined_hex_string)
-var binary_input = getBinaryArrayFromBinaryString(binary_input_string)
-console.log('Combined binary_input:'+binary_input)
+var fyko_output = "fyko_output"
 
-// prediction
+
+if(window.crypto.subtle)
+{
+    document.getElementById(fyko_output).innerHTML = "Subtle crypto there !";
+}
+
+if(window.localStorage)
+{
+    document.getElementById(fyko_output).innerHTML += "<br/><br/> Local storage supported. ANN model will be stored in localstorage";
+}
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Illustrating ANN model fetch in tfjs format followed by secure message exchange...";
+
+// Step1: Prepare payload to fetch a simple ANN from server
+var request_get_ann = JSON.stringify({"format":"tfjs"})
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Step1: Prepare a payload to request a Simple ANN Model from Server. Payload = "+request_get_ann;
+
+// Step2: request for a TFJS based Simple ANN
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Step2: Fetch a Simple ANN Model in TFJS Format";
+let response = await new Promise(resolve => {
+    var xhr_get_ann = new XMLHttpRequest(); 
+    xhr_get_ann.open("POST", '/get_ann'); 
+    xhr_get_ann.setRequestHeader("Content-Type", "application/json");
+    xhr_get_ann.onload = function(e) {
+        resolve(xhr_get_ann.response);
+      };
+      xhr_get_ann.onerror = function () {
+        resolve(undefined);
+        console.error("Error case");
+      };
+    xhr_get_ann.send(request_get_ann);
+ })
+
+var json_response = JSON.parse(response);
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Response from Server = "+response;
+
+var ann_id = json_response['ann_id']
+document.getElementById(fyko_output).innerHTML += "<br/><br/> ANN ID obtained from Server = "+ann_id;
+
+// Step 3: Form the url to load the model.json file using the ann_id
+var model_json_url = 'http://localhost:8000/tfjs/'+ann_id+'/model.json'
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 3: Form the url to load model.json. URL = "+model_json_url;
+
+
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 4: Load the tfjs model using tf library";
+const model = await tf.loadLayersModel(model_json_url);
+document.getElementById(fyko_output).innerHTML += "<br/> Model "+ann_id+" loaded into localstorage.";
+
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 5: Use the ANN model to generate AES Key";
+const d = new Date();
+var current_time = Math.round(d.getTime()/1000);
+document.getElementById(fyko_output).innerHTML += "<br/> Current UTC Time in Seconds = "+current_time;
+var random_string = window.crypto.randomUUID()
+document.getElementById(fyko_output).innerHTML += "<br/> Random String = "+random_string;
+var current_time_hash = CryptoJS.MD5(''+current_time).toString();
+var random_string_hash = CryptoJS.MD5(random_string).toString();
+document.getElementById(fyko_output).innerHTML += "<br/> Get MD5 Hashes of current UTC seconds and random string. Combine their binary bits and feed into ANN.";
+var binary_input_string = interleave_binary_strings(getBinaryString(random_string_hash), getBinaryString(current_time_hash))
+var combined_hex_string = getHexString(binary_input_string)
+var binary_input = getBinaryArrayFromBinaryString(binary_input_string)
+// Generate AES Key
 const prediction = model.predict(tf.expandDims(binary_input,0));
 var predictionArray = prediction.dataSync()
 var mean_value = tf.mean(predictionArray).dataSync()[0]
 var aesKeyBinaryString = getAesKeyBinaryString(predictionArray, mean_value)
-console.log('aesKeyBinaryString:'+aesKeyBinaryString)
 var aesKeyHexString = getHexString(aesKeyBinaryString)
-console.log('aesKeyHexString:'+aesKeyHexString)
-prediction.print();
+document.getElementById(fyko_output).innerHTML += "<br/><br/>s AES Key Generated = "+aesKeyHexString;
+
+// Step 6: Prepare a secret message to be sent to the server using AES Key generated.
+var secret_message = "Hi in Telugu:హాయ్, Hi in Chinese:你好, Hi in Japanese:やあ"
+document.getElementById(fyko_output).innerHTML += "<br/><br/> secret_message = "+secret_message;
+var secret_message_uri_encoded = encodeURIComponent(encodeURIComponent(secret_message))
+document.getElementById(fyko_output).innerHTML += "<br/><br/> secret_message_uri_encoded = "+secret_message_uri_encoded;
+var secret_message_b64_string = window.btoa(secret_message_uri_encoded)
+document.getElementById(fyko_output).innerHTML += "<br/><br/> secret_message_b64_string = "+secret_message_b64_string;
+var key = CryptoJS.enc.Hex.parse(aesKeyHexString);
+var encrypted_message = CryptoJS.AES.encrypt(secret_message_b64_string, key, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.ZeroPadding });
+document.getElementById(fyko_output).innerHTML += "<br/><br/> encrypted_message = "+encrypted_message;
+
+// Step 7: Send encrypted message to server
+var send_message_obj = new Object();
+send_message_obj.random_string = random_string
+send_message_obj.utc_time_seconds = current_time
+send_message_obj.random_string = random_string
+send_message_obj.encrypted_message = encrypted_message.toString();
+send_message_obj.ann_id = ann_id
+var send_message_string = JSON.stringify(send_message_obj)
+
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Sending message = "+send_message_string;
+
+response = await new Promise(resolve => {
+    var xhr_get_ann = new XMLHttpRequest(); 
+    xhr_get_ann.open("POST", '/send_message'); 
+    xhr_get_ann.setRequestHeader("Content-Type", "application/json");
+    xhr_get_ann.onload = function(e) {
+        resolve(xhr_get_ann.response);
+      };
+      xhr_get_ann.onerror = function () {
+        resolve(undefined);
+        console.error("Error case");
+      };
+    xhr_get_ann.send(send_message_string);
+ })
