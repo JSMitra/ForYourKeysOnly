@@ -147,7 +147,8 @@ document.getElementById(fyko_output).innerHTML += "<br/><br/>s AES Key Generated
 
 // Step 6: Prepare a secret message to be sent to the server using AES Key generated.
 document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 6: Prepare a secret message to be sent to the server using AES Key generated.";
-var secret_message = "Hi in Telugu:హాయ్, Hi in Chinese:你好, Hi in Japanese:やあ "
+var multilingual_string = "English: FYKO is a cool project \nTelugu: FYKO ఒక మంచి ప్రాజెక్ట్ \nHindi: FYKO एक अच्छा प्रोजेक्ट है \nPortugese: FYKO é um projeto legal \nThai: FYKO เป็นโครงการที่ยอดเยี่ยม \nChinese: FYKO是一個很酷的項目 \nJapanese: FYKOはクールなプロジェクトです \nKorean: FYKO는 멋진 프로젝트입니다 \nIrish: Is tionscadal fionnuar é FYKO \nArabic: FYKO مشروع رائع" 
+var secret_message = "message id:" + window.crypto.randomUUID() + "\n" + multilingual_string
 document.getElementById(fyko_output).innerHTML += "<br/><br/> secret_message = "+secret_message;
 var secret_message_uri_encoded = encodeURIComponent(secret_message)
 document.getElementById(fyko_output).innerHTML += "<br/><br/> secret_message_uri_encoded = "+secret_message_uri_encoded;

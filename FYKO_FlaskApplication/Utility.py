@@ -205,11 +205,8 @@ unpad = lambda s: s[:-s.index(s[len(s) - 1:])]
 
 def pad_bytes(plain_text_bytes, block_size=BLOCK_SIZE,pad_with_chr=chr(0)):
   bytes_to_pad = block_size - len(plain_text_bytes) % block_size
-  print(f'bytes_to_pad={bytes_to_pad}')
   padding_bytes = (bytes_to_pad*pad_with_chr).encode('utf-8')
-  print(f'padding_bytes={padding_bytes}')
   padded_bytes = plain_text_bytes + padding_bytes
-  print(f'padded_bytes length = {len(padded_bytes)}')
   return padded_bytes
 
 def unpad_bytes(decrypted_bytes_padded):
@@ -281,11 +278,15 @@ def is_content_type_not_json(request):
 
 def decrypt_message_with_aes_key(encrypted_message, aes_key):
   # use the AES key to decrypt the secret message
-  enc_message_bytes = base64.b64decode(encrypted_message)
-  aes_key_bytes = bytes.fromhex(aes_key)
-  cipher = AES.new(key=aes_key_bytes,mode=AES.MODE_ECB)
-  decrypted_bytes_padded = cipher.decrypt(enc_message_bytes)
-  decrypted_bytes = unpad_bytes(decrypted_bytes_padded)
-  message = base64.b64decode(decrypted_bytes).decode("utf-8")
-  return message
+  try:
+    enc_message_bytes = base64.b64decode(encrypted_message)
+    aes_key_bytes = bytes.fromhex(aes_key)
+    cipher = AES.new(key=aes_key_bytes,mode=AES.MODE_ECB)
+    decrypted_bytes_padded = cipher.decrypt(enc_message_bytes)
+    decrypted_bytes = unpad_bytes(decrypted_bytes_padded)
+    message = base64.b64decode(decrypted_bytes).decode("utf-8")
+  except:
+     logging.log(msg="Error while decrypting", level=logging.ERROR)
+     return "could not decrypt", False
+  return message, True
    

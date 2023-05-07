@@ -84,16 +84,24 @@ public class FYKO {
 		System.out.println("\nStep 8: Load the model with name:" + annId);
 		InputStream h5FileStream = new FileInputStream("./" + annId);
 		MultiLayerNetwork model = KerasModelImport.importKerasSequentialModelAndWeights(h5FileStream, false);
-		
+
 		System.out.println("\nStep 9: Build message payload to send to the server");
-		long utcTimeSeconds = System.currentTimeMillis()/1000;
+		long utcTimeSeconds = System.currentTimeMillis() / 1000;
 		String randomString = UUID.randomUUID().toString();
 		String aesKey = Utility.generateAESKey(model, utcTimeSeconds, randomString);
 		aesKeyBytes = HexFormat.of().parseHex(aesKey);
-		System.out.println("UTC Time="+utcTimeSeconds+", randomString="+randomString+",aesKey="+aesKey);
+		System.out.println("UTC Time=" + utcTimeSeconds + ", randomString=" + randomString + ",aesKey=" + aesKey);
 		JSONObject sendMessage = new JSONObject();
-		String secretMessage = "message id:"+UUID.randomUUID().toString()+" \nHi in Telugu:హాయ్, \nHi in Chinese:你好, \nHi in Japanese:やあ";
-		System.out.println("Secret Message:"+secretMessage);
+		String multilingual_string = "English: FYKO is a cool project "
+				+ "\nTelugu: FYKO ఒక మంచి ప్రాజెక్ట్ \nHindi: FYKO एक अच्छा प्रोजेक्ट है "
+				+ "\nPortugese: FYKO é um projeto legal "
+				+ "\nThai: FYKO เป็นโครงการที่ยอดเยี่ยม "
+				+ "\nChinese: FYKO是一個很酷的項目 \nJapanese: FYKOはクールなプロジェクトです "
+				+ "\nKorean: FYKO는 멋진 프로젝트입니다 \nIrish: Is tionscadal fionnuar é FYKO "
+				+ "\nArabic: FYKO مشروع رائع";
+
+		String secretMessage = "message id:" + UUID.randomUUID().toString() + "\n" + multilingual_string;
+		System.out.println("Secret Message:" + secretMessage);
 		String secretMessageBase64 = Utility.getBase64String(secretMessage.getBytes());
 		aesCipher = Cipher.getInstance("AES/ECB/ZeroBytePadding", "BC");
 		key = new SecretKeySpec(aesKeyBytes, "AES");
@@ -105,37 +113,37 @@ public class FYKO {
 		sendMessage.put("encrypted_message", secretMessageEncryptedBytesBase64);
 		sendMessage.put("ann_id", annId);
 		String sendMessageString = sendMessage.toString();
-		System.out.println("Sending secret message to server:"+sendMessageString);
+		System.out.println("Sending secret message to server:" + sendMessageString);
 		responseJson = Utility.sendPayLoad(SERVER_SEND_MESSAGE, sendMessageString);
-		System.out.println("Response from Server:"+responseJson);
+		System.out.println("Response from Server:" + responseJson);
 		JSONObject receivedResponseObj = new JSONObject(responseJson);
 		String receivedMessage = receivedResponseObj.getString("request_message");
-		
+
 		System.out.println("\nStep 10: Verify if the Server was able to decrypt the message.");
-		System.out.println("Original Message:"+secretMessage);
-		System.out.println("Message decoded by Server:"+receivedMessage);
-		System.out.println("Is the original secret message sent equal to the request message in response:"+secretMessage.equals(receivedMessage));
-		
+		System.out.println("Original Message:" + secretMessage);
+		System.out.println("Message decoded by Server:" + receivedMessage);
+		System.out.println("Is the original secret message sent equal to the request message in response:"
+				+ secretMessage.equals(receivedMessage));
+
 		System.out.println("\nStep 11: sending a stale request which is older than 10 seconds to the server");
-		utcTimeSeconds = System.currentTimeMillis()/1000 - 20;
+		utcTimeSeconds = System.currentTimeMillis() / 1000 - 20;
 		sendMessage.put("random_string", randomString);
 		sendMessage.put("utc_time_seconds", utcTimeSeconds);
 		sendMessage.put("encrypted_message", secretMessageEncryptedBytesBase64);
 		sendMessage.put("ann_id", annId);
 		sendMessageString = sendMessage.toString();
 		responseJson = Utility.sendPayLoad(SERVER_SEND_MESSAGE, sendMessageString);
-		System.out.println("Response from Server:"+responseJson);
-		
+		System.out.println("Response from Server:" + responseJson);
+
 		System.out.println("\nStep 12: sending a future request which is older than 10 seconds to the server");
-		utcTimeSeconds = System.currentTimeMillis()/1000 + 20;
+		utcTimeSeconds = System.currentTimeMillis() / 1000 + 20;
 		sendMessage.put("random_string", randomString);
 		sendMessage.put("utc_time_seconds", utcTimeSeconds);
 		sendMessage.put("encrypted_message", secretMessageEncryptedBytesBase64);
 		sendMessage.put("ann_id", annId);
 		sendMessageString = sendMessage.toString();
 		responseJson = Utility.sendPayLoad(SERVER_SEND_MESSAGE, sendMessageString);
-		System.out.println("Response from Server:"+responseJson);
-		
-		
+		System.out.println("Response from Server:" + responseJson);
+
 	}
 }

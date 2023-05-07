@@ -116,14 +116,20 @@ def handle_encrypted_request():
         model= tfjs.converters.load_keras_model(model_file_path+'/model.json')
 
     aes_key,_,_,_ = Utility.generate_aes_key(model, random_string=random_string, utc_time=str(utc_time_seconds))
-    message_in_request = Utility.decrypt_message_with_aes_key(encrypted_message=enc_message, aes_key=aes_key)
-    if is_message_uri_encoded == True:
-        message_in_request = urllib.parse.unquote(message_in_request)
-    logging.log(msg='message_in_request='+message_in_request, level=logging.ERROR)
-    response_json = {
-        "request_message":message_in_request
-    }
-    return jsonify(response_json)
+    message_in_request, success = Utility.decrypt_message_with_aes_key(encrypted_message=enc_message, aes_key=aes_key)
+    if success:
+        if is_message_uri_encoded == True:
+            message_in_request = urllib.parse.unquote(message_in_request)
+        logging.log(msg='message_in_request='+message_in_request, level=logging.ERROR)
+        response_json = {
+            "request_message":message_in_request
+        }
+        return jsonify(response_json)
+    else:
+        response_json = {
+            "request_message":message_in_request
+        }
+        return jsonify(response_json), 400
 
 # path to fetch html page which inturn loads FYKO.js file which uses Tensorflowjs to load and use ANN models
 @app.route('/tfjs/FYKO_JS/<file_name>', methods=['GET'])
