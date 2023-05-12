@@ -143,7 +143,7 @@ var predictionArray = prediction.dataSync()
 var mean_value = tf.mean(predictionArray).dataSync()[0]
 var aesKeyBinaryString = getAesKeyBinaryString(predictionArray, mean_value)
 var aesKeyHexString = getHexString(aesKeyBinaryString)
-document.getElementById(fyko_output).innerHTML += "<br/><br/>s AES Key Generated = "+aesKeyHexString;
+document.getElementById(fyko_output).innerHTML += "<br/><br/>AES Key Generated = "+aesKeyHexString;
 
 // Step 6: Prepare a secret message to be sent to the server using AES Key generated.
 document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 6: Prepare a secret message to be sent to the server using AES Key generated.";

@@ -104,37 +104,58 @@ def join_binary_strings_as_array(binary_string1='',binary_string2='', one=1, zer
 
   return arr
 
+def do_quick_training(model, sample_size=256, training_epochs=10):
+    inputs = []
+    outputs = []
+    for i in range(0, sample_size):
+        random_string = str(uuid.uuid4())
+        utc_time = int(time.time())
+        input = np.array(join_binary_strings_as_array(get_binary_md5(random_string), get_utc_md5(utc_time)))
+        inputs.append(input)
+        y = np.array([random.random() for i in range(0,256)])
+        outputs.append(y)
+    inputs = np.array(inputs)
+    outputs = np.array(outputs)
+    model.fit(inputs, outputs, epochs=training_epochs, batch_size=sample_size, verbose=False)
+    return model
+
 # main function for generating simple or complex ANN
-def generate_ANN(use_complex_model=False, learning_rate=0.05):
-
-  model = Sequential()
-  model.add(Dense(256, activation='tanh', input_dim=256, kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-  # build extra layers for a complex model
-  if use_complex_model == True:
+def generate_ANN(use_complex_model=False, learning_rate=0.05, 
+                 quick_train=True, quick_train_sample_size=256, quick_train_training_epochs=10):
+    
+    model = Sequential()
+    model.add(Dense(256, activation='tanh', input_dim=256, kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+    
+    # build extra layers for a complex model
+    if use_complex_model == True:
+        model.add(Dense(256, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+        model.add(Flatten())
+        model.add(Dense(512, activation='tanh'))
+        model.add(Dense(512, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+        model.add(Dense(1024, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+        model.add(Flatten())
+        model.add(Dense(1024, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+        model.add(Dense(2048, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+        model.add(Flatten())
+        model.add(Dense(2048, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+        model.add(Flatten())
+        model.add(Dense(1024, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+        model.add(Dense(1024, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+        model.add(Dense(2048, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+        model.add(Dense(512, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+        model.add(Dense(512, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+        model.add(Flatten())
+        model.add(Dense(256, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
+    
     model.add(Dense(256, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-    model.add(Flatten())
-    model.add(Dense(512, activation='tanh'))
-    model.add(Dense(512, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-    model.add(Dense(1024, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-    model.add(Flatten())
-    model.add(Dense(1024, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-    model.add(Dense(2048, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-    model.add(Flatten())
-    model.add(Dense(2048, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-    model.add(Flatten())
-    model.add(Dense(1024, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-    model.add(Dense(1024, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-    model.add(Dense(2048, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-    model.add(Dense(512, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-    model.add(Dense(512, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-    model.add(Flatten())
     model.add(Dense(256, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-  model.add(Dense(256, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-  model.add(Dense(256, activation='tanh', kernel_initializer='RandomNormal', bias_initializer='he_uniform'))
-  
-  model.compile(loss='mse', optimizer=SGD(learning_rate=learning_rate), metrics=['accuracy', 'mse'])
-
-  return model
+    
+    model.compile(loss='mse', optimizer=SGD(learning_rate=learning_rate), metrics=['accuracy', 'mse'])
+    
+    if quick_train:
+        model = do_quick_training(model, sample_size=quick_train_sample_size, training_epochs=quick_train_training_epochs)
+    
+    return model
 
 # a method that takes an ANN model, a random string and utc time in seconds to produce an ANN
 # returns aes key hex string, aes key bits, ann raw output, input string fed into the ANN
