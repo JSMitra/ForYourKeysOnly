@@ -23,7 +23,7 @@ An application server which can Serve ANN Models and interact with clients secur
             - For Tensorflow JS (TFJS) based clients, TFJS format is used which makes a model directory containing the model.json file along with shards of .bin files representing the weights of the ANN. For a Simple ANN, the number of shards is one. For Complex ANN, around 15 shards of .bin files each 4K bytes is created. Since Tensorflow JS current does not support encryption, this Flask application serves TFJS model directory as files as TFJS Client library seeks model.json URL and replaced model.json with individual .bin shard requests
             - TFJS Clients could use HTTPS scheme run on a trusted server to get the TFJS ANN Model files due to restricted model loading options in TFJS
         - This application produes all the ANN models in ./models directory
-        - This application does not optimise model generartion, fetching or caching as it just illustrates FYKO concepts of sharing ecnrypted ANN models to clients.
+        - This application does not optimise model generation, fetching or caching as it just illustrates FYKO concepts of sharing ecnrypted ANN models to clients.
         - This application does not work with any authentication as Authentication/Authorization can be implemented in production using standard login mechanisms.
 
     Running the FYKO application:
