@@ -138,7 +138,7 @@ var binary_input_string = interleave_binary_strings(getBinaryString(random_strin
 var combined_hex_string = getHexString(binary_input_string)
 var binary_input = getBinaryArrayFromBinaryString(binary_input_string)
 // Generate AES Key
-const prediction = model.predict(tf.expandDims(binary_input,0));
+var prediction = model.predict(tf.expandDims(binary_input,0));
 var predictionArray = prediction.dataSync()
 var mean_value = tf.mean(predictionArray).dataSync()[0]
 var aesKeyBinaryString = getAesKeyBinaryString(predictionArray, mean_value)
@@ -193,10 +193,60 @@ response = await new Promise(resolve => {
  document.getElementById(fyko_output).innerHTML += "<br/><br/> Message decoded by Server: = "+json_response['request_message'];
  document.getElementById(fyko_output).innerHTML += "<br/><br/> Is the original secret message sent equal to the request message in response: = "+(json_response['request_message'] == secret_message);
 
-// Step 9:
+
+// send another sample encrypted message
+current_time = Math.round(d.getTime()/1000);
+random_string = window.crypto.randomUUID()
+current_time_hash = CryptoJS.MD5(''+current_time).toString();
+random_string_hash = CryptoJS.MD5(random_string).toString();
+binary_input_string = interleave_binary_strings(getBinaryString(random_string_hash), getBinaryString(current_time_hash))
+combined_hex_string = getHexString(binary_input_string)
+binary_input = getBinaryArrayFromBinaryString(binary_input_string)
+prediction = model.predict(tf.expandDims(binary_input,0));
+predictionArray = prediction.dataSync()
+mean_value = tf.mean(predictionArray).dataSync()[0]
+aesKeyBinaryString = getAesKeyBinaryString(predictionArray, mean_value)
+aesKeyHexString = getHexString(aesKeyBinaryString)
+secret_message = "message id:" + window.crypto.randomUUID() + "; Simple message!"
+document.getElementById(fyko_output).innerHTML += "<br/><br/>Step 9: Sending another message = "+secret_message;
+secret_message_uri_encoded = encodeURIComponent(secret_message)
+secret_message_b64_string = window.btoa(secret_message_uri_encoded)
+key = CryptoJS.enc.Hex.parse(aesKeyHexString);
+encrypted_message = CryptoJS.AES.encrypt(secret_message_b64_string, key, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.ZeroPadding });
+send_message_obj = new Object();
+send_message_obj.format="tfjs"
+send_message_obj.is_message_uri_encoded=true
+send_message_obj.random_string = random_string
+send_message_obj.utc_time_seconds = current_time
+send_message_obj.random_string = random_string
+send_message_obj.encrypted_message = encrypted_message.toString();
+send_message_obj.ann_id = ann_id
+var send_message_string = JSON.stringify(send_message_obj)
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Sending message = "+send_message_string;
+response = await new Promise(resolve => {
+    var xhr_send_message = new XMLHttpRequest(); 
+    xhr_send_message.open("POST", '/send_message'); 
+    xhr_send_message.setRequestHeader("Content-Type", "application/json");
+    xhr_send_message.onload = function(e) {
+        resolve(xhr_send_message.response);
+      };
+      xhr_send_message.onerror = function () {
+        resolve(undefined);
+        console.error("Error case");
+      };
+      xhr_send_message.send(send_message_string);
+ })
+ json_response = JSON.parse(response);
+ document.getElementById(fyko_output).innerHTML += "<br/><br/> Verify if Server is able to decrypt the simple message correctly";
+ document.getElementById(fyko_output).innerHTML += "<br/><br/> Response from server after decoding = "+response;
+ document.getElementById(fyko_output).innerHTML += "<br/><br/> Original Message: = "+secret_message;
+ document.getElementById(fyko_output).innerHTML += "<br/><br/> Message decoded by Server: = "+json_response['request_message'];
+ document.getElementById(fyko_output).innerHTML += "<br/><br/> Is the original secret message sent equal to the request message in response: = "+(json_response['request_message'] == secret_message);
+
+ // Step 10:
 current_time = Math.round(d.getTime()/1000);
 current_time = current_time - 20
-document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 9: Replay Attack Scenario";
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 10: Replay Attack Scenario";
 send_message_obj.utc_time_seconds = current_time
 send_message_string = JSON.stringify(send_message_obj)
 response = await new Promise(resolve => {
@@ -218,7 +268,7 @@ response = await new Promise(resolve => {
 // Step 10:
 current_time = Math.round(d.getTime()/1000);
 current_time = current_time + 20
-document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 10: Send future message";
+document.getElementById(fyko_output).innerHTML += "<br/><br/> Step 11: Send future message";
 send_message_obj.utc_time_seconds = current_time
 send_message_string = JSON.stringify(send_message_obj)
 response = await new Promise(resolve => {
