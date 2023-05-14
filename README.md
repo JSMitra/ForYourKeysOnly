@@ -1,6 +1,7 @@
 # ForYourKeysOnly (FYKO, can be pronounced as Fi-Ko or φ-Ko)
 ### Cyber Security Application using AES Key Generation through ANNs. 
 
+### Developer: Sai Mitra Jandhyala (mitra.js)
 ### Researched and Executed as a part of Thesis work at Liverpool John Moores University (LJMU).
 ### Its for your keys only i.e., to protect your AES Keys from sharing on the network but yet enabling Clients and Server to interact using shared ANN Models.
 
