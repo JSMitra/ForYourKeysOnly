@@ -27,6 +27,13 @@ import org.deeplearning4j.nn.modelimport.keras.exceptions.UnsupportedKerasConfig
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.json.JSONObject;
 
+/**
+ * Sample Java Client to test ANN based secure communication with a Flask Server
+ * running locally
+ * 
+ * @author mitra
+ *
+ */
 public class FYKO {
 
 	private static final String SERVER_GET_ANN_ENDPOINT = "http://localhost:8000/get_ann";
@@ -94,11 +101,9 @@ public class FYKO {
 		JSONObject sendMessage = new JSONObject();
 		String multilingual_string = "English: FYKO is a cool project "
 				+ "\nTelugu: FYKO ఒక మంచి ప్రాజెక్ట్ \nHindi: FYKO एक अच्छा प्रोजेक्ट है "
-				+ "\nPortugese: FYKO é um projeto legal "
-				+ "\nThai: FYKO เป็นโครงการที่ยอดเยี่ยม "
+				+ "\nPortugese: FYKO é um projeto legal " + "\nThai: FYKO เป็นโครงการที่ยอดเยี่ยม "
 				+ "\nChinese: FYKO是一個很酷的項目 \nJapanese: FYKOはクールなプロジェクトです "
-				+ "\nKorean: FYKO는 멋진 프로젝트입니다 \nIrish: Is tionscadal fionnuar é FYKO "
-				+ "\nArabic: FYKO مشروع رائع";
+				+ "\nKorean: FYKO는 멋진 프로젝트입니다 \nIrish: Is tionscadal fionnuar é FYKO " + "\nArabic: FYKO مشروع رائع";
 
 		String secretMessage = "message id:" + UUID.randomUUID().toString() + "\n" + multilingual_string;
 		System.out.println("Secret Message:" + secretMessage);

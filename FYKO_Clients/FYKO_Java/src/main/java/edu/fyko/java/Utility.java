@@ -9,6 +9,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -18,6 +19,12 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
+/**
+ * Utility for generating MD5 hashes, AES Keys and related methods
+ * 
+ * @author mitra
+ *
+ */
 public class Utility {
 
 	public static String getBase64String(byte[] bytes) {
@@ -28,6 +35,12 @@ public class Utility {
 		return Base64.decodeBase64(base64String);
 	}
 
+	public static String getMd52(String input) throws NoSuchAlgorithmException {
+		byte[] hash = MessageDigest.getInstance("MD5").digest(input.getBytes());
+		String checksum = new BigInteger(1, hash).toString(16);
+		return checksum;
+	}
+
 	public static String getMd5(String input) {
 		try {
 			// Static getInstance method is called with hashing MD5
@@ -35,7 +48,7 @@ public class Utility {
 
 			// digest() method is called to calculate message digest
 			// of an input digest() return array of byte
-			byte[] messageDigest = md.digest(input.getBytes());
+			byte[] messageDigest = md.digest(input.getBytes(StandardCharsets.UTF_8));
 
 			// Convert byte array into signum representation
 			BigInteger no = new BigInteger(1, messageDigest);
@@ -115,10 +128,14 @@ public class Utility {
 		FileUtils.writeByteArrayToFile(new File(filePath), bytes);
 	}
 
-	public static String generateAESKey(MultiLayerNetwork model, long utcTimeSeconds, String randomString) {
-		String utcStr = ""+ utcTimeSeconds;
-		int[] randomStringMD5Array = Utility.getBinaryArrayFromHexString(Utility.getMd5(randomString));
-		int[] utcStrMD5Array = Utility.getBinaryArrayFromHexString(Utility.getMd5(utcStr));
+	public static String generateAESKey(MultiLayerNetwork model, long utcTimeSeconds, String randomString)
+			throws NoSuchAlgorithmException {
+		return generateAESKey(model, Utility.getMd5("" + utcTimeSeconds), Utility.getMd5(randomString));
+	}
+
+	public static String generateAESKey(MultiLayerNetwork model, String utcTimeSecondsMD5, String randomStringMD5) {
+		int[] randomStringMD5Array = Utility.getBinaryArrayFromHexString(randomStringMD5);
+		int[] utcStrMD5Array = Utility.getBinaryArrayFromHexString(utcTimeSecondsMD5);
 		int[] combined_arr = Utility.interleaveArrays(randomStringMD5Array, utcStrMD5Array);
 
 		int inputs = 256;
@@ -132,7 +149,6 @@ public class Utility {
 
 		INDArray output = model.output(features);
 		double mean = output.mean().getDouble(0);
-		System.out.println("mean=" + mean);
 
 		double[] raw_output = output.toDoubleVector();
 
@@ -144,5 +160,13 @@ public class Utility {
 		}
 		String aesKey = Utility.getHexStringFromBinaryArray(raw_bits);
 		return aesKey;
+	}
+
+	public static String stripQuotes(String string) {
+		int len = string != null ? string.length() : 0;
+		if (len > 1 && '"' == string.charAt(0) && '"' == string.charAt(len - 1)) {
+			string = string.substring(1, string.length() - 1);
+		}
+		return string;
 	}
 }
