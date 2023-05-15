@@ -27,13 +27,13 @@ encrypted requests from the client and decrypt them.
 
 Following are the important Sub-Projects:
 
-	FYKO_JupyterNotebook folder consists of the Jupyter notebook which showcases the entire POC (Model Generation, Experiments) followed by a Python Client Code to interact with the Flask Application server.
+1. FYKO_JupyterNotebook folder consists of the Jupyter notebook which showcases the entire POC (Model Generation, Experiments) followed by a Python Client Code to interact with the Flask Application server.
    
-	FYKO_FlaskApplication folder consists of code to run a Flask Application to serve ANN Models and to receive encrypted requests from FYKO Clients. This folder also consists of FYKO_JS Client which has FYKO.js script which loads into the browser and fetches Tensorflowjs based Model for secure communication.
+2. FYKO_FlaskApplication folder consists of code to run a Flask Application to serve ANN Models and to receive encrypted requests from FYKO Clients. This folder also consists of FYKO_JS Client which has FYKO.js script which loads into the browser and fetches Tensorflowjs based Model for secure communication.
    
-	FYKO_Clients folder consists of a FYKO_Java project which illustrates secure communication with Flask Application using Java code
+3. FYKO_Clients folder consists of a FYKO_Java project which illustrates secure communication with Flask Application using Java code
 	
-	FYKO_Client_SampleOutputs folder contains sample outputs collected from Python, Java and JS Clients during their interaction with the FYKO Flask Application Server.
+4. FYKO_Client_SampleOutputs folder contains sample outputs collected from Python, Java and JS Clients during their interaction with the FYKO Flask Application Server.
 
 Each project folder is provided with its README.md file consisting of Setup and other instructions.
 
