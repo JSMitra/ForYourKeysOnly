@@ -7,27 +7,6 @@
 ### Course: MSc in Artificial Intelligence & Machine Learning
 
 ### Researched and Executed as a part of Thesis work at Liverpool John Moores University (LJMU).
-### Its for your keys only i.e., to protect your AES Keys from sharing on the network but yet enabling Clients and Server to interact using shared ANN Models.
-
-## ForYourKeysOnly or FYKO is a Project that makes use of ANNs for Generation of AES Keys which inturn can be used to encrypt data.
-ANNs bring the advantages of generating chaotic outputs which are sensitive to varying inputs. Exploiting this behavior, AES Keys are generated 
-using deterministic inputs to the ANN. A Client and a Server can share a common ANN Model for secure communication. 
-The Client can make a request to securely obtain an ANN Model from the Server which has a unique ID (ANN ID). 
-The Client can then feed deterministic inputs into the ANN Model to obtain a random AES Key and can encrypt request data using that AES Key. 
-The Client just has to share the deterministic inputs, ANN ID and the encrypted data with the Server. 
-The Server, using the ANN ID can fetch the ANN Model from storage, re-play the deterministic inputs on the ANN to obtain the same AES Key that the Client 
-had produced at its end and decrypt Client's request data.
-
-In the whole design, sharing of AES Keys over the network is prevented. The only important requirement would be to trasmit the ANN Model itself securely
-from the Server to the Client. Using standard native Clients based on Java or Python Runtime, it is easy to produce RSA Keypairs at the Client side and 
-share the RSA Public Key with the Server to encrypt the ANN Model. For Javascript based Clients running on browser, this approach may not work and 
-secure delivery of ANN Model solely depends SSL/TLS communication using HTTPS. HTTPS based Application Server is not covered as a part of this project as its a widely
-available piece of knowledge and production Servers are all deployed on HTTPS itself for the Clients to communicate securely. This project mainly deals
-with Application level security of protecting Client data reaching its Server.
-
-This project depicts the Proof of Concept(POC) of usability of ANNs for the desired job of AES Key production. It also depicts three different Clients 
-(Python, Java and Javascript) to show how they can interact with a Python based Flask Application Server which can serve ANN Models securely and also take
-encrypted requests from the client and decrypt them.
 
 Following are the important Sub-Projects:
 
