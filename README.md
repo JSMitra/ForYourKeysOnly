@@ -2,7 +2,10 @@
 ### Cyber Security Application using AES Key Generation through ANNs. 
 ### Important Note: This is a thesis project which is currently readonly work.
 
-### Developer: Sai Mitra Jandhyala (mitra.js)
+### Developer & Author: Sai Mitra Jandhyala (mitra.js)
+### SUDENT ID: 1061239
+### Course: MSc in Artificial Intelligence & Machine Learning
+
 ### Researched and Executed as a part of Thesis work at Liverpool John Moores University (LJMU).
 ### Its for your keys only i.e., to protect your AES Keys from sharing on the network but yet enabling Clients and Server to interact using shared ANN Models.
 
