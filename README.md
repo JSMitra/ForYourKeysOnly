@@ -3,7 +3,7 @@
 ### Important Note: This is a thesis project which is currently readonly work. I hold the copyrights of this repository.
 
 ### Developer & Author: Sai Mitra Jandhyala (mitra.js)
-### SUDENT ID: 1061239
+### STUDENT ID: 1061239
 ### Course: MSc in Artificial Intelligence & Machine Learning
 
 ### Researched and Executed as a part of Thesis work at Liverpool John Moores University (LJMU).
