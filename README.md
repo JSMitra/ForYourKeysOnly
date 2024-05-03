@@ -7,6 +7,8 @@
 
 ### Youtube Video of the Project Presentation: https://www.youtube.com/watch?v=fJqOqXfSf_M
 
+#### Presentation PDF File: https://github.com/JSMitra/ForYourKeysOnly/blob/main/ForYourKeysOnly.pdf
+
 ### Researched and Executed as a part of Thesis work at Liverpool John Moores University (LJMU).
 
 Following are the important Sub-Projects:
