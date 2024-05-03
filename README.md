@@ -5,6 +5,8 @@
 ### STUDENT ID: 1061239
 ### Course: MSc in Artificial Intelligence & Machine Learning
 
+### Youtube Video of the Project Presentation: https://www.youtube.com/watch?v=fJqOqXfSf_M
+
 ### Researched and Executed as a part of Thesis work at Liverpool John Moores University (LJMU).
 
 Following are the important Sub-Projects:
